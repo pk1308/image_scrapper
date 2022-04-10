@@ -3,15 +3,15 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-PROJECT_NAME = "oneNeuron_pypi"
-USER_NAME = "c17hawke"
+PROJECT_NAME = "image_scrapper"
+USER_NAME = "pk1308"
 
 setuptools.setup(
     name=f"{PROJECT_NAME}-{USER_NAME}",
     version="0.0.2",
     author=USER_NAME,
-    author_email="sunny.c17hawke@gmail.com",
-    description="its an implimentation of Perceptron",
+    author_email="princevkurien@gmail.com",
+    description="Image scrapping from google",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url=f"https://github.com/{USER_NAME}/{PROJECT_NAME}",
@@ -27,7 +27,9 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.7",
     install_requires=[
-        "numpy",
-        "tqdm"
+        "selenium",
+        "pymongo",
+    "webdriver_manager",
+    "requests"
     ]
 )
