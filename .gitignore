@@ -133,3 +133,9 @@ test.ipynb
 /__pycache__/
 
 /images/
+
+# Pyre type checker
+.pyre/
+
+# vscode
+.vscode/
