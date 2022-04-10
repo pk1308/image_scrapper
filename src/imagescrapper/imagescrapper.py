@@ -1,4 +1,4 @@
-from curses import meta
+
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 import time 
@@ -9,7 +9,9 @@ import logging as lg
 import gridfs
 
 
-#For selenium driver implementation on heroku
+
+
+#For selenium driver implementation 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--no-sandbox')
@@ -43,7 +45,7 @@ class mongodb:
             raise e
         
         
-    def post_file(self,db,url ,data , counter):
+    def post_file(self,db_name,url ,data , counter):
         """function to post the file to the mongodb
 
         Args:
@@ -54,9 +56,9 @@ class mongodb:
       
         lg.info(f'post_file function called with {url}')
         try :
-            db = self.client[db]
+            db = self.client[db_name]
             fs = gridfs.GridFS(db)
-            fs.put(data, filename=dc+str(counter) , metadata={"url":url})
+            fs.put(data, filename=db_name+str(counter) , metadata={"url":url , "counter":counter})
             lg.info('file posted to mongodb')
         except Exception as e:
             lg.error('file posting to mongodb failed')
@@ -102,21 +104,32 @@ class imagescrapper(mongodb):
         
     
     def __fetch_image_urls(self,query: str, max_links_to_fetch: int,sleep_between_interactions: int = 2):
+        """ function opens the google chrome and search the images for the given query 
+        returns the list of url of the images 
+
+        Args:
+            query (str): the search query eg : query = 'kitten'
+            max_links_to_fetch (int): max number of images to be fetched eg : max_links_to_fetch = 100
+            sleep_between_interactions (int, optional): to create a human interaction
+            . Defaults to 2.
+        """
         
         
         def scroll_to_end(wd):
             wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(sleep_between_interactions)
 
-            # build the google query
+        # build the google query
 
         search_url = "https://www.google.com/search?safe=off&site=&tbm=isch&source=hp&q={q}&oq={q}&gs_l=img"
 
-        # load the page
-        wd=webdriver.Chrome(ChromeDriverManager().install()) 
+       
+        wd=webdriver.Chrome(ChromeDriverManager().install()) # create the webdriver
+         # load the page 
         wd.get(search_url.format(q=query))
 
-        self.image_urls = set()
+        self.image_urls = set() # set the get the set of url 
+        #initialize the image ur no 
         image_count = 0
         results_start = 0
         while image_count < max_links_to_fetch:
@@ -160,7 +173,14 @@ class imagescrapper(mongodb):
 
         return self.image_urls
     
-    def __persist_image(self ,folder_path:str,url:str, counter):
+    def __persist_image(self ,db_name:str,url:str, counter):
+        """function takes the folder path and url of the image and save it in the
+
+        Args:
+            db_name (str): database name
+            url (str): url of the image
+            counter (_type_): counter of the image
+        """
         try:
             image_content = requests.get(url).content
 
@@ -168,24 +188,31 @@ class imagescrapper(mongodb):
             print(f"ERROR - Could not download {url} - {e}")
 
         try:
-            self.post_file( db=folder_path,url=url, data=image_content , counter=counter)
+            self.post_file( db_name=db_name,url=url, data=image_content , counter=counter)
             
-            print(f"SUCCESS - saved filename :{url} - as {self.client} ")
+            print(f"SUCCESS - saved filename :{url} -in {db_name} - Mongodb ")
         except Exception as e:
             print(f"ERROR - Could not save {url} - {e}")
 
 
     def search_and_download(self,search_term: str , number_images=10):
-        target_folder = ''.join(search_term.lower().split(' '))
+        """start function to search and download the images from google image
+
+        Args:
+            search_term (str): eg : search_term = 'kitten'
+            number_images (int, optional): number of images eg : number_images = 100 
+            Defaults to 10.
+        """
+        dbname = ''.join(search_term.lower().split(' '))
 
 
         
-        res =  self.__fetch_image_urls(search_term, number_images, )
+        res =  self.__fetch_image_urls(query = search_term, max_links_to_fetch = number_images)
         print(len(res))
 
         counter = 0
-        for elem in res:
-            self.__persist_image(target_folder, elem, counter)
+        for ele in res:
+            self.__persist_image(db_name=dbname,url= ele ,counter= counter)
             counter += 1
             
 if __name__ == '__main__':
