@@ -30,6 +30,7 @@ setuptools.setup(
         "selenium",
         "pymongo",
     "webdriver_manager",
-    "requests"
+    "requests",
+    "gridfs-fuse"
     ]
 )

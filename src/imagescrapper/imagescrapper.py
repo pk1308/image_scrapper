@@ -1,5 +1,4 @@
-
-
+from curses import meta
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 import time 
@@ -7,6 +6,7 @@ import requests
 import os 
 import pymongo
 import logging as lg 
+import gridfs
 
 
 #For selenium driver implementation on heroku
@@ -14,6 +14,7 @@ chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument("disable-dev-shm-usage")
+
 
 
 class mongodb:
@@ -38,6 +39,46 @@ class mongodb:
             lg.info('mongodb connected')
         except Exception as e:
             lg.error('mongodb connection failed')
+            lg.error(e)
+            raise e
+        
+        
+    def post_file(self,db,url ,data , counter):
+        """function to post the file to the mongodb
+
+        Args:
+            db (str): database name
+            url (str): url of the file
+            data (str): data of the file
+        """
+      
+        lg.info(f'post_file function called with {url}')
+        try :
+            db = self.client[db]
+            fs = gridfs.GridFS(db)
+            fs.put(data, filename=dc+str(counter) , metadata={"url":url})
+            lg.info('file posted to mongodb')
+        except Exception as e:
+            lg.error('file posting to mongodb failed')
+            lg.error(e)
+            raise e
+    
+    def get_file(self,db):
+        """function to get the file from the mongodb
+
+        Args:
+            db (str): database name
+            url (str): url of the file
+        """
+        lg.info(f'get_file function called with {db}')
+        try :
+            db = self.client[db]
+            fs = gridfs.GridFS(db)
+            data = db.fs.files.find()
+            lg.info('file fetched from mongodb')
+            return data
+        except Exception as e:
+            lg.error('file fetching from mongodb failed')
             lg.error(e)
             raise e
 
@@ -127,19 +168,16 @@ class imagescrapper(mongodb):
             print(f"ERROR - Could not download {url} - {e}")
 
         try:
-            f = open(os.path.join(folder_path, 'jpg' + "_" + str(counter) + ".jpg"), 'wb')
-            f.write(image_content)
-            f.close()
-            print(f"SUCCESS - saved {url} - as {folder_path}")
+            self.post_file( db=folder_path,url=url, data=image_content , counter=counter)
+            
+            print(f"SUCCESS - saved filename :{url} - as {self.client} ")
         except Exception as e:
             print(f"ERROR - Could not save {url} - {e}")
 
 
-    def search_and_download(self,search_term: str, target_path='./images', number_images=10):
-        target_folder = os.path.join(target_path, '_'.join(search_term.lower().split(' ')))
+    def search_and_download(self,search_term: str , number_images=10):
+        target_folder = ''.join(search_term.lower().split(' '))
 
-        if not os.path.exists(target_folder):
-            os.makedirs(target_folder)
 
         
         res =  self.__fetch_image_urls(search_term, number_images, )
