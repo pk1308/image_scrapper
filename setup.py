@@ -3,12 +3,12 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-PROJECT_NAME = "image_scrapper"
+PROJECT_NAME = "imagescrapper"
 USER_NAME = "pk1308"
 
 setuptools.setup(
-    name=f"{PROJECT_NAME}-{USER_NAME}",
-    version="0.0.1",
+    name=f"{PROJECT_NAME}{USER_NAME}",
+    version="0.0.2",
     author=USER_NAME,
     author_email="princevkurien@gmail.com",
     description="Image scrapping from google",

@@ -17,83 +17,11 @@ chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument("disable-dev-shm-usage")
 
-
-
-class mongodb:
-    '''class for mongo db operations'''
-    
-    def __init__(self,mongodb_client):
-        """Initialize the class with the database name and collection name
-        the class initialization the class with the below argument 
-
-        Args:
-            mongodb_client (pymongo.MongoClient): mongodb client
-            db : database name
-            
-        """
-        
-        lg.debug('init function called')
-        try :
-            
-            self.client = pymongo.MongoClient(mongodb_client)
-            
-            
-            lg.info('mongodb connected')
-        except Exception as e:
-            lg.error('mongodb connection failed')
-            lg.error(e)
-            raise e
-        
-        
-    def post_file(self,db_name,url ,data , counter):
-        """function to post the file to the mongodb
-
-        Args:
-            db (str): database name
-            url (str): url of the file
-            data (str): data of the file
-        """
       
-        lg.info(f'post_file function called with {url}')
-        try :
-            db = self.client[db_name]
-            fs = gridfs.GridFS(db)
-            fs.put(data, filename=db_name+str(counter) , metadata={"url":url , "counter":counter})
-            lg.info('file posted to mongodb')
-        except Exception as e:
-            lg.error('file posting to mongodb failed')
-            lg.error(e)
-            raise e
-    
-    def get_file(self,db_name):
-        """function to get the file from the mongodb
 
-        Args:
-            db (str): database name
-            url (str): url of the file
-        """
-        lg.info(f'get_file function called with {db_name}')
-        try :
-            db = self.client[db_name]
-            fs = gridfs.GridFS(db)
-            datas = db.fs.files.find()
-            lg.info('file fetched from mongodb')
-            
-        except Exception as e:
-            lg.error('file fetching from mongodb failed')
-            lg.error(e)
-            raise e
-        dir_path = f'data/{db_name}'
-        os.makedirs(dir_path,exist_ok=True)
-        for data in datas:
-            print(data["filename"])
-            id = data['_id']
-            output = fs.get(id).read()
-            with open(f'{dir_path}/{data["filename"]}.jpg', 'wb') as f:
-                f.write(output)
             
 
-class imagescrapper(mongodb):
+class imagescrapper:
     """_summary_
     This class is used to scrape the images from Google image and save it in the mongodb
     """
@@ -109,7 +37,19 @@ class imagescrapper(mongodb):
         """
         
         
-        super().__init__(mongodb_client)
+        lg.debug('init function called')
+        try :
+            
+            self.client = mongodb_client
+            
+            
+            
+            lg.info('mongodb connected')
+        except Exception as e:
+            lg.error('mongodb connection failed')
+            lg.error(e)
+            raise e
+        
         
     
     def __fetch_image_urls(self,query: str, max_links_to_fetch: int,sleep_between_interactions: int = 2):
@@ -224,6 +164,55 @@ class imagescrapper(mongodb):
             self.__persist_image(db_name=dbname,url= ele ,counter= counter)
             counter += 1
         datas = self.get_file(db_name=dbname)
+        print(datas)
+        
+    def post_file(self,db_name,url ,data , counter):
+        """function to post the file to the mongodb
+
+        Args:
+            db (str): database name
+            url (str): url of the file
+            data (str): data of the file
+        """
+      
+        lg.info(f'post_file function called with {url}')
+        try :
+            db = self.client[db_name]
+            fs = gridfs.GridFS(db)
+            fs.put(data, filename=db_name+str(counter) , metadata={"url":url , "counter":counter})
+            lg.info('file posted to mongodb')
+        except Exception as e:
+            lg.error('file posting to mongodb failed')
+            lg.error(e)
+            raise e
+    
+    def get_file(self,db_name):
+        """function to get the file from the mongodb
+
+        Args:
+            db (str): database name
+            url (str): url of the file
+        """
+        lg.info(f'get_file function called with {db_name}')
+        try :
+            db = self.client[db_name]
+            fs = gridfs.GridFS(db)
+            datas = db.fs.files.find()
+            lg.info('file fetched from mongodb')
+            
+        except Exception as e:
+            lg.error('file fetching from mongodb failed')
+            lg.error(e)
+            raise e
+        dir_path = f'data/{db_name}'
+        os.makedirs(dir_path,exist_ok=True)
+        for data in datas:
+            print(data["filename"])
+            id = data['_id']
+            output = fs.get(id).read()
+            with open(f'{dir_path}/{data["filename"]}.jpg', 'wb') as f:
+                f.write(output)
+        return "Data saved to {}".format(dir_path)
         
     
             
