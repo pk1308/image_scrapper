@@ -32,7 +32,7 @@ class imagescrapper:
 
         Args:
              mongodb_client (pymongo.MongoClient): mongodb client
-            db : database name
+           
             
         """
         
@@ -139,7 +139,7 @@ class imagescrapper:
         try:
             self.post_file( db_name=db_name,url=url, data=image_content , counter=counter)
             
-            print(f"SUCCESS - saved filename :{url} -in {db_name} - Mongodb ")
+            print(f"SUCCESS -saved file_counter :{counter} -in - Mongodb db={db_name} ")
         except Exception as e:
             print(f"ERROR - Could not save {url} - {e}")
 
@@ -163,6 +163,7 @@ class imagescrapper:
         for ele in res:
             self.__persist_image(db_name=dbname,url= ele ,counter= counter)
             counter += 1
+        print(f"Total images saved to mongodb db : {dbname} : {counter}")
         datas = self.get_file(db_name=dbname)
         print(datas)
         
