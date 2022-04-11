@@ -8,7 +8,7 @@ USER_NAME = "pk1308"
 
 setuptools.setup(
     name=f"{PROJECT_NAME}-{USER_NAME}",
-    version="0.0.2",
+    version="0.0.3",
     author=USER_NAME,
     author_email="princevkurien@gmail.com",
     description="Image scrapping from google",
