@@ -65,24 +65,33 @@ class mongodb:
             lg.error(e)
             raise e
     
-    def get_file(self,db):
+    def get_file(self,db_name):
         """function to get the file from the mongodb
 
         Args:
             db (str): database name
             url (str): url of the file
         """
-        lg.info(f'get_file function called with {db}')
+        lg.info(f'get_file function called with {db_name}')
         try :
-            db = self.client[db]
+            db = self.client[db_name]
             fs = gridfs.GridFS(db)
-            data = db.fs.files.find()
+            datas = db.fs.files.find()
             lg.info('file fetched from mongodb')
-            return data
+            
         except Exception as e:
             lg.error('file fetching from mongodb failed')
             lg.error(e)
             raise e
+        dir_path = f'data/{db_name}'
+        os.makedirs(dir_path,exist_ok=True)
+        for data in datas:
+            print(data["filename"])
+            id = data['_id']
+            output = fs.get(id).read()
+            with open(f'{dir_path}/{data["filename"]}.jpg', 'wb') as f:
+                f.write(output)
+            
 
 class imagescrapper(mongodb):
     """_summary_
@@ -214,6 +223,9 @@ class imagescrapper(mongodb):
         for ele in res:
             self.__persist_image(db_name=dbname,url= ele ,counter= counter)
             counter += 1
+        datas = self.get_file(db_name=dbname)
+        
+    
             
 if __name__ == '__main__':
     pass 
