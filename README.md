@@ -8,7 +8,6 @@ pip install pymongo[srv]
 
 pip install image-scrapper-pk1308
 
-
 step 2
 
 from imagescrapper.runner import imagescrapper
@@ -21,19 +20,18 @@ mongourl ="mongodb+srv://`<username>`:`<password>`@`<cluster-name>`.mongodb.net/
 
 client = pymongo.MongoClient(mongourl)
 
-
 step4
 
 scrapper =imagescrapper(client)
 
-scrapper.search_and_download(search_term="Virat kholi",number_images=10)
+scrapper.search(search_term="dhoni",db_name="dumpy",number_images=10)(search_term="Virat kholi",number_images=10)
+
+scrapper.download(search_term="dhoni",db_name="dumpy")search_term="dhoni",db_name="dumpy",number_images=10)(search_term="Virat kholi",number_images=10
 
 **Enjoy**
 
 Data saved to data/Virat kholi
 
-
-link to pip 
-
+link to pip
 
 pip install image-scrapper-pk1308
