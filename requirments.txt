@@ -4,4 +4,3 @@ selenium
 chromedriver-py
 webdriver-manager
 Pillow
--e .

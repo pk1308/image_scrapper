@@ -10,4 +10,3 @@ def google_scrapper(folder_path: str, search_term: str, number_images: int = 10)
     """
     scrapper = imagescrapper(folder_path=folder_path)
     scrapper.search(search_term=search_term, number_images=number_images)
-    
