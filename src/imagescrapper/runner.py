@@ -1,7 +1,6 @@
 import io
 import os
 import time
-
 from urllib import request
 
 import selenium_stealth  # avoid detection from website that selenium is used
@@ -11,9 +10,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-from imagescrapper.util import download_chromedriver
 
 from imagescrapper.logger import logger
+from imagescrapper.util import download_chromedriver
 
 
 class imagescrapper(webdriver.Chrome):
@@ -35,7 +34,6 @@ class imagescrapper(webdriver.Chrome):
             os.makedirs(
                 self.folder_path, exist_ok=True
             )  # create the folder if not exists
-            self.driver_path = driver_path
             self.teardown = teardown
             options = Options()
             options.add_argument("--disable-gpu")
@@ -44,17 +42,15 @@ class imagescrapper(webdriver.Chrome):
             options.add_argument("--no-sandbox")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option("useAutomationExtension", False)
+            if os.name == "nt":
+                driver_path = download_chromedriver()
 
             super(imagescrapper, self).__init__(
-                service=Service(self.driver_path), options=options
+                service=Service(driver_path), options=options
             )
             self.implicitly_wait(15)
         except Exception as e:
             logger.error(e)
-            driver_path = download_chromedriver()
-            super(imagescrapper, self).__init__(
-                service=Service(driver_path), options=options
-            )
 
     def __enter__(self):
         super(imagescrapper, self).__enter__()
