@@ -8,6 +8,7 @@ notebook
 ipykernel
 types-requests
 ensure
+wget
 
 # dev requirements -
 pytest==7.1.3

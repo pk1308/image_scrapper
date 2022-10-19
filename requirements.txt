@@ -4,6 +4,7 @@ chromedriver-py
 webdriver-manager
 Pillow
 types-requests
-ensure 
+ensure
+wget
 
 -e .

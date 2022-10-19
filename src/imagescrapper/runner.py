@@ -1,6 +1,7 @@
 import io
 import os
 import time
+
 from urllib import request
 
 import selenium_stealth  # avoid detection from website that selenium is used
@@ -10,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+from imagescrapper.util import download_chromedriver
 
 from imagescrapper.logger import logger
 
@@ -40,16 +42,17 @@ class imagescrapper(webdriver.Chrome):
             options.add_argument("--headless")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--no-sandbox")
-            # options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            # options.add_experimental_option('useAutomationExtension', False)
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
 
             super(imagescrapper, self).__init__(
                 service=Service(self.driver_path), options=options)
             self.implicitly_wait(15)
         except Exception as e:
-            logger.error("mongodb connection failed")
             logger.error(e)
-            raise e
+            driver_path= download_chromedriver()
+            self.__init__(folder_path, driver_path, teardown)
+
 
     def __enter__(self):
         super(imagescrapper, self).__enter__()
