@@ -36,7 +36,6 @@ class imagescrapper(webdriver.Chrome):
             self.driver_path = driver_path
             self.teardown = teardown
             options = Options()
-            options.add_argument("--remote-debugging-port=9222")
             options.add_argument("--disable-gpu")
             options.add_argument("--headless")
             options.add_argument("--disable-dev-shm-usage")
