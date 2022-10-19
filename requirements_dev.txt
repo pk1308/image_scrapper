@@ -7,6 +7,7 @@ Pillow
 notebook
 ipykernel
 types-requests
+ensure
 
 # dev requirements -
 pytest==7.1.3
