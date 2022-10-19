@@ -1,4 +1,3 @@
-
 import io
 import os
 import time
@@ -8,6 +7,7 @@ import selenium_stealth  # avoid detection from website that selenium is used
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -19,25 +19,33 @@ class imagescrapper(webdriver.Chrome):
     This class is used to scrape the images from Google image and save it in the mongodb
     """
 
-    def __init__(self,folder_path: str = "scrapped_images",
-        driver_path=ChromeDriverManager().install()):
+    def __init__(
+        self,
+        folder_path: str = "scrapped_images",
+        driver_path=ChromeDriverManager().install(),
+        teardown: bool = False,
+    ):
         """ """
 
         try:
 
             self.folder_path = folder_path
-            os.makedirs(self.folder_path, exist_ok=True)  # create the folder if not exists
+            os.makedirs(
+                self.folder_path, exist_ok=True
+            )  # create the folder if not exists
             self.driver_path = driver_path
+            self.teardown = teardown
             options = Options()
             options.add_argument("--remote-debugging-port=9222")
             options.add_argument("--disable-gpu")
             options.add_argument("--headless")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--no-sandbox")
-            options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
+            # options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            # options.add_experimental_option('useAutomationExtension', False)
 
-            super(imagescrapper, self).__init__(executable_path=self.driver_path, options=options)
+            super(imagescrapper, self).__init__(
+                service=Service(self.driver_path), options=options)
             self.implicitly_wait(15)
         except Exception as e:
             logger.error("mongodb connection failed")
@@ -70,9 +78,7 @@ class imagescrapper(webdriver.Chrome):
         """
 
         def scroll_to_end():
-            self.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);"
-            )
+            self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(sleep_between_interactions)
 
         # build the google query
@@ -186,3 +192,8 @@ class imagescrapper(webdriver.Chrome):
                 pass
         logger.info(f"Downloaded {image_counter} images")
         return image_counter
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.teardown:
+            super(imagescrapper, self).__exit__()
+            self.quit()
