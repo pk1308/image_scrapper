@@ -6,3 +6,4 @@ Pillow
 types-requests
 ensure 
 
+-e .

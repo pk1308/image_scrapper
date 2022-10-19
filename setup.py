@@ -10,7 +10,7 @@ SRC_REPO = ""
 
 setuptools.setup(
     name=f"{PROJECT_NAME}-{USER_NAME}",
-    version="0.0.8",
+    version="0.0.9",
     author=USER_NAME,
     author_email="princevkurien@gmail.com",
     description="Image scrapping from google",
@@ -30,5 +30,5 @@ setuptools.setup(
     python_requires=">=3.1",
     install_requires=[
         "selenium",
-    "webdriver_manager"  ]
+    "webdriver_manager" , "selenium_stealth" , "ensure" ]
 )
