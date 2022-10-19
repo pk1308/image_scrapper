@@ -1,6 +1,6 @@
-fake_useragent
 selenium_stealth
 selenium
 chromedriver-py
 webdriver-manager
 Pillow
+types-requests

@@ -1,18 +1,13 @@
+import io
 import logging as lg
 import os
-import sys
 import time
-import io
-import requests
-from PIL import Image
+from urllib import request
 
-import fake_useragent
 import selenium_stealth  # avoid detection from website that selenium is used
+from PIL import Image
 from selenium import webdriver
-
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-
 # to avoid installation of the driver manually
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -35,7 +30,6 @@ class imagescrapper:
             os.makedirs(
                 self.folder_path, exist_ok=True
             )  # create the folder if not exists
-            user_agent = fake_useragent.UserAgent  # create the mongodb client
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-gpu")
@@ -176,7 +170,8 @@ class imagescrapper:
 
         for i, url in enumerate(fetched_url):
             try:
-                img_content = requests.get(url).content
+                data = request.urlopen(url)
+                img_content = data.read()
                 img_file = io.BytesIO(img_content)
                 image = Image.open(img_file)
                 file_pth = os.path.join(folder_path, f"{search_term}{i}.jpg")

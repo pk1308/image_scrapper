@@ -3,12 +3,14 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+
 PROJECT_NAME = "image_scrapper"
 USER_NAME = "pk1308"
+SRC_REPO = ""
 
 setuptools.setup(
     name=f"{PROJECT_NAME}-{USER_NAME}",
-    version="0.0.6",
+    version="0.0.7",
     author=USER_NAME,
     author_email="princevkurien@gmail.com",
     description="Image scrapping from google",
@@ -28,8 +30,5 @@ setuptools.setup(
     python_requires=">=3.1",
     install_requires=[
         "selenium",
-    "webdriver_manager",
-    "requests",
-    
-    ]
+    "webdriver_manager"  ]
 )
