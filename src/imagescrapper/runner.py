@@ -43,16 +43,18 @@ class imagescrapper(webdriver.Chrome):
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--no-sandbox")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
+            options.add_experimental_option("useAutomationExtension", False)
 
             super(imagescrapper, self).__init__(
-                service=Service(self.driver_path), options=options)
+                service=Service(self.driver_path), options=options
+            )
             self.implicitly_wait(15)
         except Exception as e:
             logger.error(e)
-            driver_path= download_chromedriver()
-            self.__init__(folder_path, driver_path, teardown)
-
+            driver_path = download_chromedriver()
+            super(imagescrapper, self).__init__(
+                service=Service(driver_path), options=options
+            )
 
     def __enter__(self):
         super(imagescrapper, self).__enter__()
