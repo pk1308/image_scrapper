@@ -45,6 +45,7 @@ class imagescrapper(webdriver.Chrome):
         if _SYSTEM == "windows":
             logger.info("windows")
             chrome_options.binary_location = binary_path
+            chrome_options.add_argument("--remote-debugging-port=9222")
             chrome_service = Service(binary_path)
             super(imagescrapper, self).__init__(service=chrome_service, options=chrome_options)
         elif _SYSTEM == "linux":
