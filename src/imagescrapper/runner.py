@@ -13,11 +13,11 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 from imagescrapper.logger import logger
-from imagescrapper.util import download_windows_chrome
 
 _chrome_driver = ChromeDriverManager().install()
 # firstly download all needed chrome drivers which matches current chrome version
 _SYSTEM = platform.system().lower()
+
 
 class imagescrapper(webdriver.Chrome):
     """_summary_
@@ -36,14 +36,29 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            if _SYSTEM == "windows":
-                download_windows_chrome()
-                self.driver = webdriver.Chrome(executable_path=_chrome_driver, options=chrome_options)
-            elif  _SYSTEM in ["linux", "darwin"]:
-                service = Service(binary_path)
-                self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            self.driver = self.get_driver_instance(chrome_options)
         except Exception as e:
             logger.error(e)
+            if _SYSTEM == "windows":
+                logger.info("windows")
+                self.driver = webdriver.Chrome(
+                    executable_path=_chrome_driver, options=chrome_options
+                )
+
+    def get_driver_instance(self, chrome_options):
+        if _SYSTEM == "windows":
+            logger.info("windows")
+            return webdriver.Chrome(
+                executable_path=_chrome_driver, options=chrome_options
+            )
+        elif _SYSTEM == "linux":
+            logger.info("linux")
+            service_linux = Service(binary_path)
+            return webdriver.Chrome(service=service_linux, options=chrome_options)
+        elif _SYSTEM == "darwin":
+            logger.info("mac")
+            service_mac = Service(binary_path)
+            return webdriver.Chrome(service=service_mac, options=chrome_options)
 
     def __enter__(self):
         super(imagescrapper, self).__enter__()
