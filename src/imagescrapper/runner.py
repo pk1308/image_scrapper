@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from imagescrapper.logger import logger
 
-_chrome_driver = ChromeDriverManager().install()
+
 # firstly download all needed chrome drivers which matches current chrome version
 _SYSTEM = platform.system().lower()
 
@@ -36,29 +36,23 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            self.driver = self.get_driver_instance(chrome_options)
+            self.get_driver_instance(chrome_options)
         except Exception as e:
             logger.error(e)
-            if _SYSTEM == "windows":
-                logger.info("windows")
-                self.driver = webdriver.Chrome(
-                    executable_path=_chrome_driver, options=chrome_options
-                )
 
     def get_driver_instance(self, chrome_options):
         if _SYSTEM == "windows":
             logger.info("windows")
-            return webdriver.Chrome(
-                executable_path=_chrome_driver, options=chrome_options
-            )
+            _chrome_driver = ChromeDriverManager().install()
+            super(imagescrapper, self).__init__(executable_path=_chrome_driver, options=chrome_options)
         elif _SYSTEM == "linux":
             logger.info("linux")
             service_linux = Service(binary_path)
-            return webdriver.Chrome(service=service_linux, options=chrome_options)
+            super(imagescrapper, self).__init__(service=service_linux, options=chrome_options)
         elif _SYSTEM == "darwin":
             logger.info("mac")
             service_mac = Service(binary_path)
-            return webdriver.Chrome(service=service_mac, options=chrome_options)
+            super(imagescrapper, self).__init__(service=service_mac, options=chrome_options)
 
     def __enter__(self):
         super(imagescrapper, self).__enter__()
@@ -86,7 +80,7 @@ class imagescrapper(webdriver.Chrome):
         """
 
         def scroll_to_end():
-            self.driver.execute_script(
+            self.execute_script(
                 "window.scrollTo(0, document.body.scrollHeight);"
             )
             time.sleep(sleep_between_interactions)
@@ -96,7 +90,7 @@ class imagescrapper(webdriver.Chrome):
         search_url = "https://www.google.com/search?safe=off&site=&tbm=isch&source=hp&q={q}&oq={q}&gs_l=img"
 
         # load the page
-        self.driver.get(search_url.format(q=query))
+        self.get(search_url.format(q=query))
 
         self.image_urls = set()  # set the get the set of url
 
@@ -107,7 +101,7 @@ class imagescrapper(webdriver.Chrome):
             scroll_to_end()
 
             # get all image thumbnail results
-            thumbnail_results = self.driver.find_elements(
+            thumbnail_results = self.find_elements(
                 by=By.CSS_SELECTOR, value="img.Q4LuWd"
             )
             number_results = len(thumbnail_results)
@@ -126,7 +120,7 @@ class imagescrapper(webdriver.Chrome):
 
                 # extract image urls
 
-                actual_images = self.driver.find_elements(
+                actual_images = self.find_elements(
                     by=By.CSS_SELECTOR, value="img.n3VNCb"
                 )
                 for actual_image in actual_images:
@@ -154,7 +148,7 @@ class imagescrapper(webdriver.Chrome):
         logger.info(
             f"Found: {number_results} search results. Extracting links from {len(self.image_urls)}:{number_results}"
         )
-        self.driver.quit()
+        self.quit()
         return self.image_urls
 
     def search(self, search_term: str, number_images: int = 10):
