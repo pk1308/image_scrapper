@@ -44,8 +44,9 @@ class imagescrapper(webdriver.Chrome):
     def get_driver_instance(self, chrome_options):
         if _SYSTEM == "windows":
             logger.info("windows")
-            windows_driver_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-            super(imagescrapper, self).__init__(executable_path=windows_driver_path, options=chrome_options)
+            chrome_options.binary_location = binary_path
+            chrome_service = Service(binary_path)
+            super(imagescrapper, self).__init__(service=chrome_service, options=chrome_options)
         elif _SYSTEM == "linux":
             logger.info("linux")
             service_linux = Service(binary_path)
