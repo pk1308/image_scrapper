@@ -1,10 +1,9 @@
 selenium_stealth
 selenium
-chromedriver-py==106.0.5249.61
 webdriver-manager
 Pillow
 types-requests
 ensure
 wget
-
+chromedriver-autoinstaller
 -e .

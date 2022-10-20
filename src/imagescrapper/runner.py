@@ -1,28 +1,24 @@
 import io
 import os
-import platform
 import time
 from urllib import request
 
-import selenium_stealth  # avoid detection from website that selenium is used
-from chromedriver_py import binary_path
+import chromedriver_autoinstaller  # avoid detection from website that selenium is used
+import selenium_stealth
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
 
 from imagescrapper.logger import logger
 
-
 # firstly download all needed chrome drivers which matches current chrome version
-_SYSTEM = platform.system().lower()
+driver_binary_path = chromedriver_autoinstaller.install()
 
 
 class imagescrapper(webdriver.Chrome):
     """_summary_
-    This class is used to scrape the images from Google image and save it in the mongodb
+    This class is used to scrape the images from Google image search
     """
 
     def __init__(self, folder_path: str = "scrapped_images", teardown: bool = False):
@@ -37,25 +33,13 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            self.get_driver_instance(chrome_options)
+            chrome_service = Service(driver_binary_path)
+            self.section_id = str(time.time()).replace(".", "")
+            super(imagescrapper, self).__init__(
+                service=chrome_service, options=chrome_options
+            )
         except Exception as e:
             logger.error(e)
-
-    def get_driver_instance(self, chrome_options):
-        if _SYSTEM == "windows":
-            logger.info("windows")
-            chrome_options.binary_location = binary_path
-            chrome_options.add_argument("--remote-debugging-port=9222")
-            chrome_service = Service(binary_path)
-            super(imagescrapper, self).__init__(service=chrome_service, options=chrome_options)
-        elif _SYSTEM == "linux":
-            logger.info("linux")
-            service_linux = Service(binary_path)
-            super(imagescrapper, self).__init__(service=service_linux, options=chrome_options)
-        elif _SYSTEM == "darwin":
-            logger.info("mac")
-            service_mac = Service(binary_path)
-            super(imagescrapper, self).__init__(service=service_mac, options=chrome_options)
 
     def __enter__(self):
         super(imagescrapper, self).__enter__()
@@ -83,9 +67,7 @@ class imagescrapper(webdriver.Chrome):
         """
 
         def scroll_to_end():
-            self.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);"
-            )
+            self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(sleep_between_interactions)
 
         # build the google query

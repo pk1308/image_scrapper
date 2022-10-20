@@ -29,4 +29,10 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.1",
     install_requires=[
-        "selenium","webdriver_manager" , "selenium_stealth" , "ensure" , "chromedriver-py", "Pillow" ])
+        "selenium",
+        "webdriver-manager",
+        "selenium_stealth",
+        "ensure",
+        "Pillow",
+    ],
+)
