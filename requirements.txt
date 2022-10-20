@@ -1,6 +1,6 @@
 selenium_stealth
 selenium
-chromedriver-py == 106.0.5249.61
+chromedriver-py
 webdriver-manager
 Pillow
 types-requests

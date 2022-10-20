@@ -10,7 +10,7 @@ SRC_REPO = ""
 
 setuptools.setup(
     name=f"{PROJECT_NAME}-{USER_NAME}",
-    version="0.0.9",
+    version="0.0.10",
     author=USER_NAME,
     author_email="princevkurien@gmail.com",
     description="Image scrapping from google",
@@ -29,6 +29,4 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.1",
     install_requires=[
-        "selenium",
-    "webdriver_manager" , "selenium_stealth" , "ensure" ]
-)
+        "selenium","webdriver_manager" , "selenium_stealth" , "ensure" , "chromedriver-py", "Pillow" ])
