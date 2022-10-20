@@ -33,7 +33,6 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("disable-dev-shm-usage")
             logger.info(f"Sytem : {_SYSTEM}")
             if _SYSTEM == "windows":
-                path= chromedriver_autoinstaller.install()
                 chrome_service = Service("C:\SeleniumWebDrivers\ChromeDriver")
             else:
                 chrome_service = Service(ChromeDriverManager().install())
