@@ -1,6 +1,7 @@
 import io
 import os
 import time
+import uuid
 from urllib import request
 
 import selenium_stealth  # avoid detection from website that selenium is used
@@ -9,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+from chromedriver_py import binary_path
 
 from imagescrapper.logger import logger
 
@@ -18,19 +20,20 @@ class imagescrapper(webdriver.Chrome):
     This class is used to scrape the images from Google image and save it in the mongodb
     """
 
-    def __init__(self, folder_path: str = "scrapped_images", driver_path=ChromeDriverManager().install(), teardown: bool = False):
+    def __init__(self, folder_path: str = "scrapped_images", teardown: bool = False):
         """ """
 
         try:
             self.folder_path = folder_path
             os.makedirs(self.folder_path, exist_ok=True)
             self.teardown = teardown
+            self.session_id = str(uuid.uuid4())
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            service = Service(driver_path)
+            service = Service(binary_path)
             self.driver = webdriver.Chrome(service=service, options=chrome_options)
             self.implicitly_wait(15)
         except Exception as e:
