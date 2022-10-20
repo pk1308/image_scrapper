@@ -1,19 +1,19 @@
 import io
 import os
 import time
-import uuid
 from urllib import request
 
 import selenium_stealth  # avoid detection from website that selenium is used
+from chromedriver_py import binary_path
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-from chromedriver_py import binary_path
 
 from imagescrapper.logger import logger
 
+_chrome_driver = ChromeDriverManager().install() # firstly download all needed chrome drivers which matches current chrome version
 
 class imagescrapper(webdriver.Chrome):
     """_summary_
@@ -27,7 +27,6 @@ class imagescrapper(webdriver.Chrome):
             self.folder_path = folder_path
             os.makedirs(self.folder_path, exist_ok=True)
             self.teardown = teardown
-            self.session_id = str(uuid.uuid4())
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-gpu")
@@ -109,9 +108,7 @@ class imagescrapper(webdriver.Chrome):
                     by=By.CSS_SELECTOR, value="img.n3VNCb"
                 )
                 for actual_image in actual_images:
-                    if actual_image.get_attribute(
-                        "src"
-                    ) and "http" in actual_image.get_attribute("src"):
+                    if actual_image.get_attribute( "src") and "http" in actual_image.get_attribute("src"):
                         url_to_add = actual_image.get_attribute("src")
 
                         self.image_urls.add(url_to_add)
