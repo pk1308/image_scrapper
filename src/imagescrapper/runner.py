@@ -34,7 +34,7 @@ class imagescrapper(webdriver.Chrome):
             logger.info(f"Sytem : {_SYSTEM}")
             if _SYSTEM == "windows":
                 path= chromedriver_autoinstaller.install()
-                chrome_service = Service()
+                chrome_service = Service("C:\SeleniumWebDrivers\ChromeDriver")
             else:
                 chrome_service = Service(ChromeDriverManager().install())
             self.section_id = str(time.time()).replace(".", "")
