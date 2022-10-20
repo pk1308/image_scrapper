@@ -34,7 +34,7 @@ class imagescrapper(webdriver.Chrome):
             logger.info(f"Sytem : {_SYSTEM}")
             if _SYSTEM == "windows":
                 driver_path = "C:\SeleniumWebDrivers\ChromeDriver"
-                os.chmod(driver_path, 0755)
+                os.chmod(driver_path, 0o755)
                 chrome_service = Service(driver_path)
             else:
                 chrome_service = Service(ChromeDriverManager().install())
