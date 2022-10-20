@@ -1,11 +1,8 @@
 import io
 import os
-import platform
-import sys
 import time
 from urllib import request
 
-import chromedriver_autoinstaller
 import selenium_stealth
 from PIL import Image
 from selenium import webdriver
@@ -15,7 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from imagescrapper.logger import logger
 
-_SYSTEM = platform.system().lower()
+
 class imagescrapper(webdriver.Chrome):
     """_summary_
     This class is used to scrape the images from Google image search    """
@@ -31,13 +28,7 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            logger.info(f"Sytem : {_SYSTEM}")
-            if _SYSTEM == "windows":
-                driver_path = "C:\SeleniumWebDrivers\ChromeDriver"
-                os.chmod(driver_path, 0o755)
-                chrome_service = Service(driver_path)
-            else:
-                chrome_service = Service(ChromeDriverManager().install())
+            chrome_service = Service(ChromeDriverManager().install())
             self.section_id = str(time.time()).replace(".", "")
             super(imagescrapper, self).__init__(
                 service=chrome_service, options=chrome_options

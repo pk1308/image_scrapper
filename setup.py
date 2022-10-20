@@ -10,7 +10,7 @@ SRC_REPO = ""
 
 setuptools.setup(
     name=f"{PROJECT_NAME}-{USER_NAME}",
-    version="0.0.10",
+    version="1.0.0",
     author=USER_NAME,
     author_email="princevkurien@gmail.com",
     description="Image scrapping from google",
