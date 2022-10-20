@@ -2,6 +2,8 @@ import io
 import os
 import time
 from urllib import request
+import platform
+import sys
 
 import selenium_stealth  # avoid detection from website that selenium is used
 from chromedriver_py import binary_path
@@ -15,7 +17,7 @@ from imagescrapper.logger import logger
 
 _chrome_driver = ChromeDriverManager().install()
 # firstly download all needed chrome drivers which matches current chrome version
-
+_SYSTEM = platform.system().lower()
 
 class imagescrapper(webdriver.Chrome):
     """_summary_
@@ -34,9 +36,11 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            service = Service(binary_path)
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
-            self.implicitly_wait(15)
+            if _SYSTEM == "windows":
+                self.driver = webdriver.Chrome(executable_path=_chrome_driver, options=chrome_options)
+            elif  _SYSTEM in ["linux", "darwin"]:
+                service = Service(binary_path)
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
         except Exception as e:
             logger.error(e)
 
