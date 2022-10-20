@@ -3,24 +3,19 @@ import os
 import time
 from urllib import request
 
-import chromedriver_autoinstaller  # avoid detection from website that selenium is used
 import selenium_stealth
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 
 from imagescrapper.logger import logger
-
-# firstly download all needed chrome drivers which matches current chrome version
-driver_binary_path = chromedriver_autoinstaller.install()
 
 
 class imagescrapper(webdriver.Chrome):
     """_summary_
-    This class is used to scrape the images from Google image search
-    """
-
+    This class is used to scrape the images from Google image search    """
     def __init__(self, folder_path: str = "scrapped_images", teardown: bool = False):
         """ """
 
@@ -33,7 +28,7 @@ class imagescrapper(webdriver.Chrome):
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("disable-dev-shm-usage")
-            chrome_service = Service(driver_binary_path)
+            chrome_service = Service(ChromeDriverManager().install())
             self.section_id = str(time.time()).replace(".", "")
             super(imagescrapper, self).__init__(
                 service=chrome_service, options=chrome_options
