@@ -13,7 +13,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from imagescrapper.logger import logger
 
-_chrome_driver = ChromeDriverManager().install() # firstly download all needed chrome drivers which matches current chrome version
+_chrome_driver = ChromeDriverManager().install()
+# firstly download all needed chrome drivers which matches current chrome version
+
 
 class imagescrapper(webdriver.Chrome):
     """_summary_
@@ -108,7 +110,9 @@ class imagescrapper(webdriver.Chrome):
                     by=By.CSS_SELECTOR, value="img.n3VNCb"
                 )
                 for actual_image in actual_images:
-                    if actual_image.get_attribute( "src") and "http" in actual_image.get_attribute("src"):
+                    if actual_image.get_attribute(
+                        "src"
+                    ) and "http" in actual_image.get_attribute("src"):
                         url_to_add = actual_image.get_attribute("src")
 
                         self.image_urls.add(url_to_add)
