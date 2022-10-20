@@ -6,13 +6,11 @@ from urllib import request
 import selenium_stealth  # avoid detection from website that selenium is used
 from PIL import Image
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 from imagescrapper.logger import logger
-from imagescrapper.util import download_chromedriver
 
 
 class imagescrapper(webdriver.Chrome):
@@ -20,34 +18,20 @@ class imagescrapper(webdriver.Chrome):
     This class is used to scrape the images from Google image and save it in the mongodb
     """
 
-    def __init__(
-        self,
-        folder_path: str = "scrapped_images",
-        driver_path=ChromeDriverManager().install(),
-        teardown: bool = False,
-    ):
+    def __init__(self, folder_path: str = "scrapped_images", driver_path=ChromeDriverManager().install(), teardown: bool = False):
         """ """
 
         try:
-
             self.folder_path = folder_path
-            os.makedirs(
-                self.folder_path, exist_ok=True
-            )  # create the folder if not exists
+            os.makedirs(self.folder_path, exist_ok=True)
             self.teardown = teardown
-            options = Options()
-            options.add_argument("--disable-gpu")
-            options.add_argument("--headless")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--no-sandbox")
-            options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option("useAutomationExtension", False)
-            if os.name == "nt":
-                driver_path = download_chromedriver()
-
-            super(imagescrapper, self).__init__(
-                service=Service(driver_path), options=options
-            )
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-gpu")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("disable-dev-shm-usage")
+            service = Service(driver_path)
+            self.driver = webdriver.Chrome(service=service, options=chrome_options)
             self.implicitly_wait(15)
         except Exception as e:
             logger.error(e)
@@ -78,7 +62,9 @@ class imagescrapper(webdriver.Chrome):
         """
 
         def scroll_to_end():
-            self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            self.driver.execute_script(
+                "window.scrollTo(0, document.body.scrollHeight);"
+            )
             time.sleep(sleep_between_interactions)
 
         # build the google query
@@ -86,7 +72,7 @@ class imagescrapper(webdriver.Chrome):
         search_url = "https://www.google.com/search?safe=off&site=&tbm=isch&source=hp&q={q}&oq={q}&gs_l=img"
 
         # load the page
-        self.get(search_url.format(q=query))
+        self.driver.get(search_url.format(q=query))
 
         self.image_urls = set()  # set the get the set of url
 
@@ -97,7 +83,7 @@ class imagescrapper(webdriver.Chrome):
             scroll_to_end()
 
             # get all image thumbnail results
-            thumbnail_results = self.find_elements(
+            thumbnail_results = self.driver.find_elements(
                 by=By.CSS_SELECTOR, value="img.Q4LuWd"
             )
             number_results = len(thumbnail_results)
@@ -116,7 +102,7 @@ class imagescrapper(webdriver.Chrome):
 
                 # extract image urls
 
-                actual_images = self.find_elements(
+                actual_images = self.driver.find_elements(
                     by=By.CSS_SELECTOR, value="img.n3VNCb"
                 )
                 for actual_image in actual_images:
@@ -144,7 +130,7 @@ class imagescrapper(webdriver.Chrome):
         logger.info(
             f"Found: {number_results} search results. Extracting links from {len(self.image_urls)}:{number_results}"
         )
-
+        self.driver.quit()
         return self.image_urls
 
     def search(self, search_term: str, number_images: int = 10):
